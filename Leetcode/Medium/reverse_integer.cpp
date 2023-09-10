@@ -1,8 +1,8 @@
 /*
-    Website: leetcode
+    Website: Leetcode
     Difficulty: Medium
     Language: c++
-    Link: https://leetcode.com/problems/reverse-integer/
+    Link: https://leetcode.com/problems/reverse-integer
 */
 
 
