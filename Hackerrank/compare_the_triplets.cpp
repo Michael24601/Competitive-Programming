@@ -11,20 +11,6 @@
 
 using namespace std;
 
-int* compareTriplets(int* a, int* b) {
-    int* s = new int[2];
-    s[0] = s[1] = 0;
-    for(int i = 0; i < 3; i++){
-        if(a[i] > b[i]){
-            s[0]++;
-        }
-        else if(b[i] > a[i]){
-            s[1]++;
-        }
-    }
-    return s;
-}
-
 int main() {
 
     int* a, *b;
@@ -38,8 +24,17 @@ int main() {
         cin >> b[i];
     }
 
-    int* c = compareTriplets(a, b);
-    cout << c[0] << " " << c[1];
+    int s1{}, s2{};
+    for(int i = 0; i < 3; i++){
+        if(a[i] > b[i]){
+            s1++;
+        }
+        else if(b[i] > a[i]){
+            s2++;
+        }
+    }
+
+    cout << s1 << " " << s2;
 
     return 0;
 }

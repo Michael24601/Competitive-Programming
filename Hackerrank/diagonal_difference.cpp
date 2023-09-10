@@ -11,15 +11,6 @@
 
 using namespace std;
 
-int diagonalDifference(vector<vector<int>>& arr) {
-    long n1{}, n2{};
-    for(int i = 0; i < arr.size(); i++){
-        n1 += arr[i][i];
-        n2 += arr[arr.size()-i-1][i];
-    }
-    return abs(n1 - n2);
-}
-
 int main()
 {
     int n;
@@ -32,9 +23,12 @@ int main()
         }
     }
 
-    int result = diagonalDifference(v);
-
-    cout << result;
+    long n1{}, n2{};
+    for(int i = 0; i < n; i++){
+        n1 += v[i][i];
+        n2 += v[n-i-1][i];
+    }
+    cout << abs(n1 - n2);
 
     return 0;
 }
