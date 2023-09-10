@@ -8,8 +8,6 @@
 
 #include <bits/stdc++.h>
 
-using namespace std;
-
 struct s {
 	long long a;
 	long long b;
@@ -26,13 +24,13 @@ bool swap(s const& s1, s const& s2) {
 int main()
 {
 	long long n;
-	cin >> n;
-	vector<s> array;
+	std::cin >> n;
+	std::vector<s> array;
 	array.resize(n);
  
  
 	for (long long i = 0; i < n; i++) {
-		cin >> array[i].a >> array[i].b;
+		std::cin >> array[i].a >> array[i].b;
 		array[i].diff = array[i].a - array[i].b;
 	}
  
@@ -41,7 +39,7 @@ int main()
     // that ensures the dragons that leave the most soldiers alives are
     // killed first, meaning that we can use the soldiers that remain for
     // the other battles.
-	sort(array.begin(), array.end(), &swap);
+	std::sort(array.begin(), array.end(), &swap);
  
     // We then calculte the number of needed soldiers, knowing it's the
     // minimum. 
@@ -64,7 +62,7 @@ int main()
  
 		}
 	}
-	cout << num;
+	std::cout << num;
  
 	return 0;
 }
