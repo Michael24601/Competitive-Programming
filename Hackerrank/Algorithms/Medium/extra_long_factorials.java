@@ -1,4 +1,3 @@
-package Medium;
 /*
     Website: Hackerank
     Difficulty: Medium
@@ -6,6 +5,9 @@ package Medium;
     Language: java
     Link: https://www.hackerrank.com/challenges/extra-long-factorials/problem
 */
+
+
+package Medium;
 
 import java.io.*;
 import java.math.*;
