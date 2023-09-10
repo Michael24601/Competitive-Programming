@@ -18,7 +18,7 @@ import java.util.stream.*;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-public class Solution {
+public class extra_long_factorials {
     public static void main(String[] args) throws IOException {
         Scanner input = new Scanner(System.in);
         int n = input.nextInt();
