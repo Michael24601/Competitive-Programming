@@ -1,3 +1,4 @@
+package Medium;
 /*
     Website: Hackerank
     Difficulty: Medium
