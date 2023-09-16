@@ -27,6 +27,7 @@ public:
             current = current->children[c - 'a'];
         }
         current->isEndOfPattern = true;
+        current->pattern = pattern;
         current->h_values.push_back(h);
         current->indeces.push_back(index);
         patterns.push_back(pattern);
@@ -96,9 +97,17 @@ private:
     struct TrieNode {
         TrieNode* children[ALPHABET_SIZE];
         TrieNode* fail;
+
+        // We include vectors of properties to allow a pattern to be counted
+        // more than once and have different properties if added multiple
+        // times. We can loop over them in the match function each time
+        // we match a pattern, and append them in the add function in the
+        // endOfPattern nodes.
         vector<int> h_values;
         vector<int> indeces;
         bool isEndOfPattern;
+
+        string pattern;
 
         TrieNode() {
             for (int i = 0; i < ALPHABET_SIZE; ++i) {
