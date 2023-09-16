@@ -71,14 +71,17 @@ public:
             while (current != root && !current->children[c - 'a']) {
                 current = current->fail;
             }
-            current = current->children[c - 'a'] ? current->children[c - 'a'] : root;
+            current = current->children[c - 'a'] 
+                ? current->children[c - 'a'] : root;
 
             // Traverse failure links and collect H values
             TrieNode* temp = current;
             while (temp != root) {
                 if (temp->isEndOfPattern) {
                     for (int i = 0; i < temp->h_values.size(); i++) {
-                        if (start <= temp->indeces[i] && temp->indeces[i] <= end) {
+                        if (start <= temp->indeces[i] 
+                            && temp->indeces[i] <= end) {
+                                
                             sum += temp->h_values[i];
                         }
                     }
