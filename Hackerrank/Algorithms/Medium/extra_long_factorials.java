@@ -25,7 +25,7 @@ public class extra_long_factorials {
     public static void main(String[] args) throws IOException {
         Scanner input = new Scanner(System.in);
         int n = input.nextInt();
-         BigInteger b = new BigInteger("1");
+        BigInteger b = new BigInteger("1");
         for(int i = 2; i <= n; i++){
             b = b.multiply(BigInteger.valueOf(i));
         }

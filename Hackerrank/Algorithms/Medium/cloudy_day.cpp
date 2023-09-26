@@ -1,3 +1,12 @@
+/*
+    Website: Hackerank
+    Difficulty: Medium
+    Type: Algorithms
+    Language: c++
+    Link: https://www.hackerrank.com/challenges/cloudy-day/problem
+*/
+
+
 #include <bits/stdc++.h>
 
 using namespace std;
