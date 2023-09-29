@@ -3,7 +3,8 @@
         "xstring": "cpp",
         "queue": "cpp",
         "utility": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "bitset": "cpp"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",

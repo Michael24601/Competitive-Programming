@@ -3,20 +3,6 @@
 
 using namespace std;
 
-// Structure to store information of a suffix
-struct suffix
-{
-    long index; // To store original index
-    long rank[2]; // To store ranks and next rank pair
-};
- 
-// A comparison function used by sort() to compare two suffixes
-// Compares two pairs, returns 1 if first pair is smaller
-long cmp(struct suffix a, struct suffix b)
-{
-    return (a.rank[0] == b.rank[0])? (a.rank[1] < b.rank[1] ?1: 0):
-               (a.rank[0] < b.rank[0] ?1: 0);
-}
 
 // Constructs a Suffix Array data structure:
 // It is an array containing the indeces of the suffix substings of a string
@@ -25,80 +11,94 @@ long cmp(struct suffix a, struct suffix b)
 
 // There are many algorithms for building a suffix array, but this is among
 // the most efficient, called the Kärkkäinen-Sanders Algorithm.
-vector<long> buildSuffixArray(string txt) {
-    
-    long n = txt.size();
-    
-    // A structure to store suffixes and their indexes
-    struct suffix* suffixes = new suffix[n];
- 
-    // Store suffixes and their indexes in an array of structures.
-    // The structure is needed to sort the suffixes alphabetically
-    // and malongain their old indexes while sorting
-    for (long i = 0; i < n; i++)
-    {
-        suffixes[i].index = i;
-        suffixes[i].rank[0] = txt[i] - 'a';
-        suffixes[i].rank[1] = ((i+1) < n)? (txt[i + 1] - 'a'): -1;
-    }
- 
-    // Sort the suffixes using the comparison function
-    // defined above.
-    sort(suffixes, suffixes+n, cmp);
- 
-    // At this polong, all suffixes are sorted according to first
-    // 2 characters.  Let us sort suffixes according to first 4
-    // characters, then first 8 and so on
-    // This array is needed to get the index in suffixes[]
-    // from original index.  This mapping is needed to get the next suffix.
-    long* ind =  new long[n];
-    for (long k = 4; k < 2*n; k = k*2)
-    {
-        // Assigning rank and index values to first suffix
-        long rank = 0;
-        long prev_rank = suffixes[0].rank[0];
-        suffixes[0].rank[0] = rank;
-        ind[suffixes[0].index] = 0;
- 
-        // Assigning rank to suffixes
-        for (long i = 1; i < n; i++)
-        {
-            // If first rank and next ranks are same as that of previous
-            // suffix in array, assign the same new rank to this suffix
-            if (suffixes[i].rank[0] == prev_rank &&
-                    suffixes[i].rank[1] == suffixes[i-1].rank[1])
-            {
-                prev_rank = suffixes[i].rank[0];
-                suffixes[i].rank[0] = rank;
-            }
-            else // Otherwise increment rank and assign
-            {
-                prev_rank = suffixes[i].rank[0];
-                suffixes[i].rank[0] = ++rank;
-            }
-            ind[suffixes[i].index] = i;
-        }
- 
-        // Assign next rank to every suffix
-        for (long i = 0; i < n; i++)
-        {
-            long nextindex = suffixes[i].index + k/2;
-            suffixes[i].rank[1] = (nextindex < n)?
-                                  suffixes[ind[nextindex]].rank[0]: -1;
-        }
- 
-        // Sort the suffixes according to first k characters
-        sort(suffixes, suffixes+n, cmp);
-    }
- 
-    // Store indexes of all sorted suffixes in the suffix array
-    vector<long> suffixArr(n);
-    for (long i = 0; i < n; i++)
-        suffixArr[i] = suffixes[i].index;
- 
-    // Return the suffix array
-    return  suffixArr;
+// suffixRank is table hold the rank of each string on each iteration  
+// suffixRank[i][j] denotes rank of jth suffix at ith iteration  
+
+int suffixRank[20][int(1E6)];
+
+// Example "abaab"  
+// Suffix Array for this (2, 3, 0, 4, 1)  
+// Create a tuple to store rank for each suffix  
+
+struct myTuple {  
+    int originalIndex;   // stores original index of suffix  
+    int firstHalf;       // store rank for first half of suffix  
+    int secondHalf;      // store rank for second half of suffix  
+};
+
+
+// function to compare two suffix in O(1)  
+// first it checks whether first half chars of 'a' are equal to first half chars of b  
+// if they compare second half  
+// else compare decide on rank of first half  
+
+int cmp(myTuple a, myTuple b) {  
+    if(a.firstHalf == b.firstHalf) return a.secondHalf < b.secondHalf;  
+    else return a.firstHalf < b.firstHalf;  
 }
+
+int main() {
+
+    // Take input string
+    // initialize size of string as N
+
+    string s; cin >> s;
+    int N = s.size();
+
+    // Initialize suffix ranking on the basis of only single character
+    // for single character ranks will be 'a' = 0, 'b' = 1, 'c' = 2 ... 'z' = 25
+
+    for(int i = 0; i < N; ++i)
+        suffixRank[0][i] = s[i] - 'a';
+
+    // Create a tuple array for each suffix
+
+    myTuple* L = new myTuple[N];
+
+    // Iterate log(n) times i.e. till when all the suffixes are sorted
+    // 'stp' keeps the track of number of iteration
+    // 'cnt' store length of suffix which is going to be compared
+
+    // On each iteration we initialize tuple for each suffix array
+    // with values computed from previous iteration
+
+    for(int cnt = 1, stp = 1; cnt < N; cnt *= 2, ++stp) {
+
+        for(int i = 0; i < N; ++i) {
+            L[i].firstHalf = suffixRank[stp - 1][i];
+            L[i].secondHalf = i + cnt < N ? suffixRank[stp - 1][i + cnt] : -1;
+            L[i].originalIndex = i;
+        }
+
+        // On the basis of tuples obtained sort the tuple array
+
+        sort(L, L + N, cmp);
+
+        // Initialize rank for rank 0 suffix after sorting to its original index
+        // in suffixRank array
+
+        suffixRank[stp][L[0].originalIndex] = 0;
+
+        for(int i = 1, currRank = 0; i < N; ++i) {
+
+            // compare ith ranked suffix ( after sorting ) to (i - 1)th ranked suffix
+            // if they are equal till now assign same rank to ith as that of (i - 1)th
+            // else rank for ith will be currRank ( i.e. rank of (i - 1)th ) plus 1, i.e ( currRank + 1 )
+
+            if(L[i - 1].firstHalf != L[i].firstHalf || L[i - 1].secondHalf != L[i].secondHalf)
+                ++currRank;
+
+            suffixRank[stp][L[i].originalIndex] = currRank;
+        }
+
+    }
+
+    // Print suffix array
+
+    for(int i = 0; i < N; ++i) cout << L[i].originalIndex << endl;
+
+    return 0;
+} 
 
 // Constructs the Longest Common Prefix (LCP) Array
 // This is an array that shows the longest common prefix (substring starting
@@ -106,56 +106,20 @@ vector<long> buildSuffixArray(string txt) {
 // suffix array. Each element is the number of characters in common between
 // suffix[i] and suffix[i+1].
 // Uses Kasai algorithm.
-std::vector<long> constructLCPArray(std::string txt, std::vector<long>& suffixArr) {
-    long n = suffixArr.size();
+vector<int> kasai(string s, vector<int> sa) {
+    int n=s.size(),k=0;
+    vector<int> lcp(n,0);
+    vector<int> rank(n,0);
 
-    // To store LCP array
-    std::vector<long> lcp(n, 0);
+    for(int i=0; i<n; i++) rank[sa[i]]=i;
 
-    // An auxiliary array to store the inverse of suffix array
-    // elements. For example, if suffixArr[0] is 5, invSuff[5] would store 0.
-    // This is used to get the next suffix string from the suffix array.
-    std::vector<long> invSuff(n, 0);
-
-    // Fill values in invSuff[]
-    for (long i = 0; i < n; i++)
-        invSuff[suffixArr[i]] = i;
-
-    // Initialize the length of the previous LCP
-    long k = 0;
-
-    // Process all suffixes one by one starting from
-    // the first suffix in txt[]
-    for (long i = 0; i < n; i++)
+    for(int i=0; i<n; i++, k?k--:0)
     {
-        // If the current suffix is at n-1, then we don't
-        // have the next substring to consider. So the LCP is not
-        // defined for this substring; we put zero.
-        if (invSuff[i] == n - 1)
-        {
-            k = 0;
-            continue;
-        }
-
-        // j contains the index of the next substring to
-        // be considered to compare with the present
-        // substring, i.e., the next string in the suffix array
-        long j = suffixArr[invSuff[i] + 1];
-
-        // Directly start matching from the k'th index as
-        // at least k-1 characters will match
-        while (i + k < n && j + k < n && txt[i + k] == txt[j + k])
-            k++;
-
-        // LCP for the present suffix
-        lcp[invSuff[i]] = k;
-
-        // Deleting the starting character from the string
-        if (k > 0)
-            k--;
+        if(rank[i]==n-1) {k=0; continue;}
+        int j=sa[rank[i]+1];
+        while(i+k<n && j+k<n && s[i+k]==s[j+k]) k++;
+        lcp[rank[i]]=k;
     }
-
-    // Return the constructed LCP array
     return lcp;
 }
 

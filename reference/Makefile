@@ -3,7 +3,7 @@ EXE = test.exe
 OBJ = $(SRC:.cpp=.o)
 FILE = test.cpp
 
-OUTPUT = myOutput.txt
+OUTPUT = output.txt
 INPUT = input.txt
 
 # Lets us send the name of file to execute using make FILE=
