@@ -1,99 +1,97 @@
+
 #include <bits/stdc++.h>
 
 using namespace std;
 
-// Max size of the bitset
-constexpr int SIZE = 600 * 600;
+const int INF = 1e9;
 
-void gameOfLifeIteration(bitset<SIZE>& grid, int n, int m){
-    
-    bitset<SIZE> copy;
+// Modfied Djikstra that can consider 0 paths as valid paths
+int dijkstra(vector<vector<pair<int, int>>>& graph, 
+    int startIndex, int endIndex) {
 
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            int liveNeighbors{};
-            int smallerI = (i-1 < 0 ? n-1 : i-1);
-            int smallerJ = (j-1 < 0 ? m-1 : j-1);
-            int biggerI = (i+1 >= n ? 0 : i+1);
-            int biggerJ = (j+1 >= m ? 0 : j+1);
+    int n = graph.size();
+    vector<int> dist(n, INF);
+    dist[startIndex] = 0;
 
-            if (grid[smallerI * m + smallerJ]) liveNeighbors++;
-            if (grid[i * m + smallerJ]) liveNeighbors++;
-            if (grid[biggerI * m + smallerJ]) liveNeighbors++;
-            if (grid[smallerI * m + j]) liveNeighbors++;
-            if (grid[biggerI * m + j]) liveNeighbors++;
-            if (grid[smallerI * m + biggerJ]) liveNeighbors++;
-            if (grid[i * m + biggerJ]) liveNeighbors++;
-            if (grid[biggerI * m + biggerJ]) liveNeighbors++;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push({0, startIndex});
 
-            
-            if(liveNeighbors == 3){
-                copy.set(i * m + j);
-            }
-            else if(grid[i * m + j] && liveNeighbors == 2){
-                copy.set(i * m + j);
-            }
-            else{
-                // Leave it 0
+    while (!pq.empty()) {
+        int d = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
+
+        if (u == endIndex) {
+            return d;
+        }
+
+        if (dist[u] < d) {
+            continue;
+        }
+
+        for (const pair<int, int>& edge : graph[u]) {
+            int v = edge.first;
+            int w = edge.second;
+
+            if (dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
             }
         }
     }
-    
-    grid = copy;
+
+    return -1; // No path found
 }
 
 int main() {
-    long n, m, c;
-    cin >> n >> m >> c;
 
-    // To save on time, instead of going through all iterations up to c,
-    // we save each state in a vector, and when we reach the original again,
-    // we conclude we are in a cycle, and determine which of the previous
-    // states we encountered we need to ouput.
-    // This saves on time, but also wastes time since we will have to
-    // compare the grid each time. For a fast comparison, we can use
-    // bitsets to represent grids where grid[i][j] is the i*n+j bit.
+    int ROWS, COLS, q;
+    cin >> ROWS >> COLS >> q;
 
-    bitset<SIZE> grid;
-    // Original grid
-    bitset<SIZE> original;
-    
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            char c;
-            cin >> c;
-            if(c == '*'){
-                grid.set(i * m + j);
-                original.set(i * m + j);
+    vector<string> grid(ROWS);
+    for(int i = 0; i < ROWS; i++){
+        cin >> grid[i];
+    }
+
+    vector<vector<pair<int, int>>> adjacencyList(ROWS * COLS);
+
+    // Define directions (8 possible moves)
+    const int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    const int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    for (int y = 0; y < ROWS; ++y) {
+        for (int x = 0; x < COLS; ++x) {
+            // For each cell, connect it to its neighbors with either 0 or 1 cost
+            for (int dir = 0; dir < 8; ++dir) {
+                int newX = x + dx[dir];
+                int newY = y + dy[dir];
+
+                // Check if the neighbor is within bounds
+                if (newY >= 0 && newY < ROWS && newX >= 0 && newX < COLS) {
+
+                    int currentCell = y * COLS + x;
+                    int neighborCell = newY* COLS + newX;
+
+                    // Determine the cost based on the cell value (O or ~)
+                    int cost = (grid[y][x] == '~' && grid[newY][newX] == 'O') ? 1 : 0;
+
+                    // Add the neighbor with the corresponding cost
+                    adjacencyList[currentCell].emplace_back(neighborCell, cost);
+                }
             }
         }
     }
-    
-    // To make the code go faster, if the original grid repeats, we know
-    // the pattern, and can guess the minimum times we need to apply it
-    // to get the same result as applying it c times
 
-    for(int k = 1; k <= c; k++){
-        gameOfLifeIteration(grid, n, m);
+    while(q--){
 
-        if(grid == original){
-            // Times it needs to be repeated to get c
-            int timesNeeded = c % k;
-            while(timesNeeded--){
-                gameOfLifeIteration(grid, n, m);
-            }
-            // Leave the outer while loop
-            break;
-        }
+        int startY, startX, endY, endX;
+        cin >> startY >> startX >> endY >> endX;
+
+        int startIndex = (startY-1) * COLS + (startX-1);
+        int endIndex = (endY-1) * COLS + (endX-1);
+
+        cout << dijkstra(adjacencyList, startIndex, endIndex) << "\n";
     }
-    
-    for(int i = 0; i < n; i++){
-        for(int j = 0; j < m; j++){
-            if(grid[i * m + j]) cout << '*';
-            else cout << '-';
-        }
-        cout << "\n";
-    }
-    
+
     return 0;
 }
