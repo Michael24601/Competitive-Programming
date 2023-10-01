@@ -4,7 +4,8 @@
         "queue": "cpp",
         "utility": "cpp",
         "vector": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "random": "cpp"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",
