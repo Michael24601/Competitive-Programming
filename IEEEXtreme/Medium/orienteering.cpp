@@ -17,7 +17,7 @@ float pathTime(int i, int j, int k, int l,
     return t;
 }
 
-// Shortest path using djikstra (with a list, not matrix)
+// Shortest path using djikstra (with an adjacency list, not matrix)
 float shortestPathDijkstra(const vector<vector<pair<int, float>>>& adjacencyList, 
     int A, int B) {
 

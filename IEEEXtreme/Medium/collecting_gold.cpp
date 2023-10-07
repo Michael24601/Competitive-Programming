@@ -12,8 +12,6 @@ using namespace std;
 
 // We can use dijkstra's for the shortest path
 
- // Function to find the shortest path from node A to node B
- // Using Dijkstra's algorithm.
 vector<long long> dijkstraShortestPath(const vector<vector<long long>>& graph, 
     long long A, long long B) {
     long long numVertices = graph.size();
@@ -34,7 +32,7 @@ vector<long long> dijkstraShortestPath(const vector<vector<long long>>& graph,
         long long u = pq.top().second;
         pq.pop();
 
-        if (u == B) break; // Stop early if we have reached node B
+        if (u == B) break;
 
         if (visited[u]) continue;
 
@@ -50,7 +48,7 @@ vector<long long> dijkstraShortestPath(const vector<vector<long long>>& graph,
         }
     }
 
-    // Reconstructs the shortest path to find the indices
+    // We can reconstruct the shortest path to find the indices of the path
     vector<long long> shortestPath;
     long long currentVertex = B;
     while (currentVertex != -1) {
@@ -104,7 +102,7 @@ int main() {
     // of primes from 2 to n where the product only goes on until it exceeds
     // 10^18 (the maximum of k). This will only be around 25 values, 
     // which helps us immensly as it removes the need to calculate the
-    // first n primes a costly expenditure.
+    // first n primes, something that takes a lot of time.
     // (2 3 5 and 7). We use a python program to generate these.
     /*
         import sympy
@@ -123,7 +121,8 @@ int main() {
         products_of_primes()
     */
     // Note the last value isn't really the next largest prime product
-    // after 10^18, but just any number after 10^18, as the former doesn't fit.
+    // after 10^18, but just any number after 10^18, as the former doesn't fit
+    // in a long long variable.
     // In this case, it's 10^18 + 5. For the last number in this array only,
     // any number larger than 10^18 will do, as long as it fits in a long long.
     long long primeProducts[] {
@@ -146,7 +145,7 @@ int main() {
     };
     
     
-    // We sort the ids so we can linearly go through them whil increasing
+    // We sort the ids so we can linearly go through them while increasing
     // prime factors. Only do this for shortest path ids.
     vector<long long> idSorted;
     for (long long i = 0; i < shortestPath.size(); i++) {

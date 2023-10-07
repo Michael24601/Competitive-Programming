@@ -14,7 +14,7 @@ int main() {
     int t;
     cin >> t;
     
-    // Last digit of fibonaci numbers follows a 60 cycle
+    // Last digit of fibonaci numbers follows a 60-cycle
     vector<short> f(61);
     f[0] = 0;
     f[1] = 1;

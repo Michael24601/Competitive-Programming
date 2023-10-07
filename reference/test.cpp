@@ -3,94 +3,77 @@
 
 using namespace std;
 
-const int INF = 1e9;
 
-// Modfied Djikstra that can consider 0 paths as valid paths
-int dijkstra(vector<vector<pair<int, int>>>& graph, 
-    int startIndex, int endIndex) {
+vector<int> maxSum(vector<int>& v){
+    sort(v.begin(), v.end());
+    int numOne{}, numZero{};
+    int i = 0;
+    for(; i < v.size() && v[i] <= 1; i++){
+        if(v[i] == 0) numZero++;
+        else if (v[i] == 1) numOne++;
+    }
 
-    int n = graph.size();
-    vector<int> dist(n, INF);
-    dist[startIndex] = 0;
-
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    pq.push({0, startIndex});
-
-    while (!pq.empty()) {
-        int d = pq.top().first;
-        int u = pq.top().second;
-        pq.pop();
-
-        if (u == endIndex) {
-            return d;
-        }
-
-        if (dist[u] < d) {
-            continue;
-        }
-
-        for (const pair<int, int>& edge : graph[u]) {
-            int v = edge.first;
-            int w = edge.second;
-
-            if (dist[u] + w < dist[v]) {
-                dist[v] = dist[u] + w;
-                pq.push({dist[v], v});
-            }
+    vector<int> sorted;
+    while(numZero > 0){
+        sorted.push_back(0);
+        numZero--;
+    }
+    if(numOne == 1)
+        sorted.push_back(1);
+    else if (numOne > 1){
+        while(numOne > 1){
+            sorted.push_back(1);
+            numOne--;
         }
     }
 
-    return -1; // No path found
+    // Pick up from where we left off
+    vector<int> alternateVector(v.size() - i);
+    for(int j = 0; i < v.size(); j++, i++){
+        if (j % 2 == 0) {
+            alternateVector[(j+1)/2] = v[i];
+        } else {
+            // Place elements from the end of the sorted vector
+            alternateVector[alternateVector.size() - (j+1)/2] = v[i];
+        }
+    }
+
+    // Push back into original
+    for(int a: alternateVector){
+        sorted.push_back(a);
+    }
+
+    if(numOne > 0)
+        sorted.push_back(1);
+
+    return sorted;
+}
+
+long sum(vector<int>& v){
+    long s{};
+    for(int i = 0; i < v.size() - 1; i++){
+        s += v[i] * v[i+1];
+    }
+    return s;
 }
 
 int main() {
 
-    int ROWS, COLS, q;
-    cin >> ROWS >> COLS >> q;
-
-    vector<string> grid(ROWS);
-    for(int i = 0; i < ROWS; i++){
-        cin >> grid[i];
-    }
-
-    vector<vector<pair<int, int>>> adjacencyList(ROWS * COLS);
-
-    // Define directions (8 possible moves)
-    const int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
-    const int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-
-    for (int y = 0; y < ROWS; ++y) {
-        for (int x = 0; x < COLS; ++x) {
-            // For each cell, connect it to its neighbors with either 0 or 1 cost
-            for (int dir = 0; dir < 8; ++dir) {
-                int newX = x + dx[dir];
-                int newY = y + dy[dir];
-
-                // Check if the neighbor is within bounds
-                if (newY >= 0 && newY < ROWS && newX >= 0 && newX < COLS) {
-
-                    int currentCell = y * COLS + x;
-                    int neighborCell = newY* COLS + newX;
-
-                    // Determine the cost based on the cell value (O or ~)
-                    int cost = (grid[y][x] == '~' && grid[newY][newX] == 'O') ? 1 : 0;
-
-                    // Add the neighbor with the corresponding cost
-                    adjacencyList[currentCell].emplace_back(neighborCell, cost);
-                }
-            }
+    int t;
+    cin >> t;
+    while(t--){
+        int n;
+        cin >> n;
+        vector<int> v(n);
+        for(int i = 0; i < n ; i++){
+            cin >> v[i];
         }
-    }
-
-    while(q--){
-
-        int startY, startX, endY, endX;
-        cin >> startY >> startX >> endY >> endX;
-
-        int startIndex = (startY-1) * COLS + (startX-1);
-        int endIndex = (endY-1) * COLS + (endX-1);
-
-        cout << dijkstra(adjacencyList, startIndex, endIndex) << "\n";
+        vector<int> s = maxSum(v);
+        cout << sum(s) << "\n";
+        for(int a: v){
+            cout << a << " ";
+        }
+        cout << "\n";
     }
 
     return 0;

@@ -11,7 +11,7 @@ package Easy;
 import java.util.*;
 import java.math.BigInteger;
 
-// This problem has a trick question.
+// This is a trick question.
 // While the naive approach would be to use combinations
 // or permutations, these either take too long or, in the
 // case of gactorial memoization, too much space. 

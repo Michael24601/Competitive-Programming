@@ -14,7 +14,7 @@ struct Gadget {
     int weight;
 };
 
-// Uses the 1/0 knapsack algorithm
+// Uses the 1/0 knapsack algorithm, a classic dynamic programming algorithm
 int maxPower(int n, int c, vector<Gadget>& Gadgets) {
     
     // The approach to this problem is to fill a 2D array of dimension n+1, c+1,
