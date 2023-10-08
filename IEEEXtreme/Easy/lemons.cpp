@@ -1,6 +1,6 @@
 /*
     Website: IEEEXtreme
-    Difficulty: Medium
+    Difficulty: Easy
     Language: c++
     Link: https://csacademy.com/ieeextreme-practice/task/lemons
 */

@@ -1,10 +1,14 @@
-#include <iostream>
-#include <vector>
+/*
+    Website: IEEEXtreme
+    Difficulty: Hard
+    Language: c++
+    Link: https://csacademy.com/ieeextreme-practice/task/46e8a03f242b875f1ae5fb84a3b4321f/
+*/
+
+
+#include <bits/stdc++.h>
 
 using namespace std;
-
-#include <vector>
-
 
 class FenwickTree1D {
 private:
@@ -454,7 +458,8 @@ int main() {
                 cin >> r[i];
             }
 
-            int result = fenwick.queryRange(l[0], l[1], l[2], l[3], l[4], r[0], r[1], r[2], r[3], r[4]);
+            int result = fenwick.queryRange(l[0], l[1], l[2], l[3], l[4], 
+                r[0], r[1], r[2], r[3], r[4]);
             cout << result << "\n";
         }
     }

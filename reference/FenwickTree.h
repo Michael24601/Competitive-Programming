@@ -1,9 +1,35 @@
-#include <iostream>
-#include <vector>
+#ifndef FENWICK_TREE_H
+#define FENWICK_TREE_H
+
+#include "bits/stdc++.h"
 
 using namespace std;
 
-#include <vector>
+
+// A Binary Indexed Tree, or a Fenwick Tree, allows us to do sum queries for
+// a range in an array. It is the equivalent of creating a 2D array to store
+// all combinations of range sums, but instead of O(n) updating, O(1) retrieval,
+// and O(n^2) space, it has O(n) space and O(log(n)) retrieval and update.
+// Moreover, the space that the array occupies grows exponentially the more
+// dimensions you add to the array, while the Fenwick tree is always the same
+// size as the array itself.
+// So while the array approach works when we have a small array and a lot of
+// space (and not a whole lot of dimensions), and when we are sure we never
+// want to update, the Fenwick tree approach trades a little speed during
+// retrieval for better space complexity and the ability to update values.
+// Moreover, to build the array initially, it takes O(n^2) time, while
+// a Fenwick tree can be built in O(nlog(n)) time (n times log(n) 
+// taking updates).
+
+// It is similar to a segment tree, but has its advantages and disadvantages.
+// On one hand, unlike a Segment Tree, it only support a single type of
+// operation: sums.
+// On the other hand, it is easier to implement, and supports N dimensions
+// arrays and subarrays. Sadly, it is too complex to implement a single
+// class for a general n dimensions, and each class for now is seperate.
+
+// Note that the following implementation, by convention and for ease,
+// uses 1 indexing, so the first index in a 3D Fenwick tree is (1, 1, 1).
 
 
 class FenwickTree1D {
@@ -69,7 +95,8 @@ public:
     }
 
     int queryRange(int x1, int y1, int x2, int y2) {
-        return query(x2, y2) - query(x2, y1 - 1) - query(x1 - 1, y2) + query(x1 - 1, y1 - 1);
+        return query(x2, y2) - query(x2, y1 - 1) 
+        - query(x1 - 1, y2) + query(x1 - 1, y1 - 1);
     }
 };
 
@@ -271,193 +298,4 @@ public:
 };
 
 
-// When summing the elements of an n-dimensional array, we usually have
-// 3 methods that can be used:
-// Segment trees let us update and retrieve ranges in O(log(n)) time, 
-// with the main advantage being that they are not limited to sum queries
-// (we can also have min/max queries) and the main disadvantage being that
-// they are complex and can't be extended to multiple dimensions, at least not
-// easily.
-// Another approach is keeping a 2n-dimensional array that records the 
-// sum of all combinations of an n-dimensional sub array. This appraoch is
-// very fast for retrieval, with O(1) time complexity, but takes too much space,
-// takes too much time to build the initial array with O(n^2) time, and
-// does not allow us to update the values (or does, but forces us to rebuild
-// the affectef portion of the array in O(n) time).
-// On the other hand, Fenwick Trees, or Binary Indexed Trees let us retrieve
-// values a little bit slower, with O(log(n)) reitrieval, but build the 
-// tree in O(nlog(n)) time, which is faster, update a value in O(log(n)) time,
-// and only take as much space as the original array, so O(n).
-// Even though we don't intend to update values in the array, Fenwick Trees
-// provide the best solution to this problem.
-
-
-int main() {
-    int d;
-    cin >> d;
-
-    vector<int> dim(d);
-    for (int i = 0; i < d; ++i) {
-        cin >> dim[i];
-    }
-
-    int totalSize = 1;
-    for (int i = 0; i < d; ++i) {
-        totalSize *= dim[i];
-    }
-
-    // Since we don't have a general n dimensional Fenwick tree class,
-    // we handle each case individually.
-    if (d == 1) {
-        FenwickTree1D fenwick(dim[0]);
-        vector<int> values(totalSize);
-
-        for (int i = 0; i < dim[0]; ++i) {
-            cin >> values[i];
-            fenwick.update(i + 1, values[i]);
-        }
-
-        int q;
-        cin >> q;
-        while (q--) {
-            vector<int> l(d), r(d);
-            for (int i = 0; i < d; ++i) {
-                cin >> l[i];
-            }
-            for (int i = 0; i < d; ++i) {
-                cin >> r[i];
-            }
-
-            int result = fenwick.queryRange(l[0], r[0]);
-            cout << result << "\n";
-        }
-    }
-    else if (d == 2) {
-        FenwickTree2D fenwick(dim[0], dim[1]);
-        vector<vector<int>> values(dim[0], vector<int>(dim[1]));
-
-        // Read values into a 2D vector
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                cin >> values[i][j];
-                fenwick.update(i + 1, j + 1, values[i][j]);
-            }
-        }
-
-        int q;
-        cin >> q;
-        while (q--) {
-            vector<int> l(d), r(d);
-            for (int i = 0; i < d; ++i) {
-                cin >> l[i];
-            }
-            for (int i = 0; i < d; ++i) {
-                cin >> r[i];
-            }
-
-            int result = fenwick.queryRange(l[0], l[1], r[0], r[1]);
-            cout << result << "\n";
-        }
-    }
-    else if (d == 3) {
-        FenwickTree3D fenwick(dim[0], dim[1], dim[2]);
-        vector<vector<vector<int>>> values(dim[0], 
-        vector<vector<int>>(dim[1], vector<int>(dim[2])));
-
-        // Read values into a 3D vector
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                for (int k = 0; k < dim[2]; ++k) {
-                    cin >> values[i][j][k];
-                    fenwick.update(i + 1, j + 1, k + 1, values[i][j][k]);
-                }
-            }
-        }
-
-        int q;
-        cin >> q;
-        while (q--) {
-            vector<int> l(d), r(d);
-            for (int i = 0; i < d; ++i) {
-                cin >> l[i];
-            }
-            for (int i = 0; i < d; ++i) {
-                cin >> r[i];
-            }
-
-            int result = fenwick.queryRange(l[0], l[1], l[2], r[0], r[1], r[2]);
-            cout << result << "\n";
-        }
-    }
-    else if (d == 4) {
-        FenwickTree4D fenwick(dim[0], dim[1], dim[2], dim[3]);
-        vector<vector<vector<vector<int>>>> values(dim[0], 
-        vector<vector<vector<int>>>(dim[1], 
-        vector<vector<int>>(dim[2], vector<int>(dim[3]))));
-
-        // Read values into a 4D vector
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                for (int k = 0; k < dim[2]; ++k) {
-                    for (int l = 0; l < dim[3]; ++l) {
-                        cin >> values[i][j][k][l];
-                        fenwick.update(i + 1, j + 1, k + 1, l + 1, values[i][j][k][l]);
-                    }
-                }
-            }
-        }
-
-        int q;
-        cin >> q;
-        while (q--) {
-            vector<int> l(d), r(d);
-            for (int i = 0; i < d; ++i) {
-                cin >> l[i];
-            }
-            for (int i = 0; i < d; ++i) {
-                cin >> r[i];
-            }
-
-            int result = fenwick.queryRange(l[0], l[1], l[2], l[3], r[0], r[1], r[2], r[3]);
-            cout << result << "\n";
-        }
-    }
-    else if (d == 5) {
-        FenwickTree5D fenwick(dim[0], dim[1], dim[2], dim[3], dim[4]);
-        vector<vector<vector<vector<vector<int>>>>> 
-        values(dim[0], vector<vector<vector<vector<int>>>>(dim[1], 
-        vector<vector<vector<int>>>(dim[2], 
-        vector<vector<int>>(dim[3], vector<int>(dim[4])))));
-
-        // Read values into a 5D vector
-        for (int i = 0; i < dim[0]; ++i) {
-            for (int j = 0; j < dim[1]; ++j) {
-                for (int k = 0; k < dim[2]; ++k) {
-                    for (int l = 0; l < dim[3]; ++l) {
-                        for (int m = 0; m < dim[4]; ++m) {
-                            cin >> values[i][j][k][l][m];
-                            fenwick.update(i + 1, j + 1, k + 1, l + 1, m + 1, values[i][j][k][l][m]);
-                        }
-                    }
-                }
-            }
-        }
-
-        int q;
-        cin >> q;
-        while (q--) {
-            vector<int> l(d), r(d);
-            for (int i = 0; i < d; ++i) {
-                cin >> l[i];
-            }
-            for (int i = 0; i < d; ++i) {
-                cin >> r[i];
-            }
-
-            int result = fenwick.queryRange(l[0], l[1], l[2], l[3], l[4], r[0], r[1], r[2], r[3], r[4]);
-            cout << result << "\n";
-        }
-    }
-        
-    return 0;
-}
+#endif
