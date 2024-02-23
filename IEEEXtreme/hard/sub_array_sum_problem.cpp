@@ -28,7 +28,7 @@ public:
     }
 
 
-    // Nunber of elements according to the dimensions
+    // Number of elements according to the dimensions
     int getDimensionsProduct(){
         int product = 1;
         for(int i = 0; i < dimensions.size(); i++){
@@ -125,6 +125,13 @@ public:
         return sum;
     }
 
+
+    
+    // We can get any sum in an n-dimensional array by adding and
+    // removing different m-dimensional (m <= n) sums that all start at
+    // the first index (0, 0, 0 ... n times).
+    // Note that how many sums we add an remove will follow the combinations
+    // C(n, m). We can simulate that with bit operations.
     int queryRange(vector<int> from, vector<int> to) {
 
         int numConfigurations = 1 << n;
@@ -152,7 +159,7 @@ public:
                 }
             }
 
-            // The count of false values in the code indicates if the sign
+            // The number of false values in the code indicates if the sign
             // should be + or -. There is always 0 false values in the
             // first iteration, and then after that the sign alternates 
             // with each number of false values.
