@@ -25,8 +25,7 @@ using namespace std;
 // On one hand, unlike a Segment Tree, it only support a single type of
 // operation: sums.
 // On the other hand, it is easier to implement, and supports N dimensions
-// arrays and subarrays. Sadly, it is too complex to implement a single
-// class for a general n dimensions, and each class for now is seperate.
+// arrays and subarrays.
 
 // Note that the following implementation, by convention and for ease,
 // uses 1 indexing, so the first index in a 3D Fenwick tree is (1, 1, 1).
@@ -57,8 +56,10 @@ public:
         return sum;
     }
 
-    int queryRange(int from, int to) {
-        return query(to) - query(from - 1);
+    int queryRange(int x1, int x2) {
+        int result =  query(x1);
+        result -= query(x2 - 1);
+        return result;
     }
 };
 
@@ -95,8 +96,11 @@ public:
     }
 
     int queryRange(int x1, int y1, int x2, int y2) {
-        return query(x2, y2) - query(x2, y1 - 1) 
-        - query(x1 - 1, y2) + query(x1 - 1, y1 - 1);
+        int result = query(x2, y2);
+        result -= query(x2, y1 - 1);
+        result -= query(x1 - 1, y2);
+        result += query(x1 - 1, y1 - 1);
+        return result;
     }
 };
 
@@ -137,10 +141,15 @@ public:
     }
 
     int queryRange(int x1, int y1, int z1, int x2, int y2, int z2) {
-        return query(x2, y2, z2) - query(x2, y2, z1 - 1) 
-        - query(x2, y1 - 1, z2) - query(x1 - 1, y2, z2)
-             + query(x2, y1 - 1, z1 - 1) + query(x1 - 1, y2, z1 - 1) 
-             + query(x1 - 1, y1 - 1, z2) - query(x1 - 1, y1 - 1, z1 - 1);
+        int result = query(x2, y2, z2) ;
+        result -= query(x2, y2, z1 - 1);
+        result -= query(x2, y1 - 1, z2);
+        result -= query(x1 - 1, y2, z2);
+        result += query(x2, y1 - 1, z1 - 1); 
+        result += query(x1 - 1, y2, z1 - 1); 
+        result += query(x1 - 1, y1 - 1, z2);
+        result -= query(x1 - 1, y1 - 1, z1 - 1);
+        return result;
     }
 };
 
@@ -294,6 +303,187 @@ public:
         result -= query(v1 - 1, w1 - 1, x1 - 1, y1 - 1, z1 - 1);
 
         return result;
+    }
+};
+
+
+// We can generalize the code with an n-dimensional Fenwick Tree.
+// Note that although it is easier to work with, it is a little bit
+// slower. This is because it has some extra overhead:
+// We need to nest the loops n times, so we have to use recursion.
+// Moreover, in these recursive update and query functions, we need
+// to send a vector (current) by value each time in order to capture
+// all the branching coordinates we must change.
+// We also need to save the n-dimensional array in a 1D array and convert
+// between n-dimensional coordinates and linear coordinates.
+// The class is still fast, but marginally slower than the above classes.
+// The time complexity is of course still the same.
+
+
+class FenwickTreeND {
+
+private:
+
+    vector<int> dimensions;
+    // Number of dimensions
+    int n;
+    vector<int> values;
+
+    // Goes from loop depth = 0 to n-1
+    // Make sure current is an n sized vector
+    // Usually, we would need n nested loops, however, in this case, since
+    // n is set at runtime, we can instead use recursion to call the function
+    // within each loop up to a depth of n.
+    // To keep track of each index in each loop, we have the vector current.
+    // which we need to pass by value. 
+    void updateRec(vector<int>& coordinates, int val, int loopDepth, 
+        vector<int> current) {
+
+        if(loopDepth < n){
+            for (int a = coordinates[loopDepth]; a <= dimensions[loopDepth]; a += (a & -a)) {
+                current[loopDepth] = a;
+                updateRec(coordinates, val, loopDepth + 1, current);
+            }
+        }
+        else if (loopDepth == n){
+            values[getLinearCoordinate(current)] += val;
+        }
+    }
+
+
+    // Sum starts at 0 and is returned in the end,
+    // it will be filled with the value in the end
+    // Like the previous function, we need to have n nested loops, so we use
+    // recursion, also with a current vector to keep track of the indeces.
+    void queryRec(vector<int>& coordinates, int loopDepth, int& sum,
+        vector<int> current) {
+
+        if(loopDepth < n){
+            for (int a = coordinates[loopDepth]; a > 0; a -= (a & -a)) {
+                current[loopDepth] = a;
+                queryRec(coordinates, loopDepth + 1, sum, current);
+            }
+        }
+        else if (loopDepth == n){
+            sum += values[getLinearCoordinate(current)];
+        }
+    }
+
+    public:
+
+    FenwickTreeND(vector<int> dimensions) {
+        this->dimensions = dimensions;
+        n = dimensions.size();
+        values.resize(getDimensionsProduct());
+    }
+
+
+    // Nunber of elements according to the dimensions
+    int getDimensionsProduct(){
+        int product = 1;
+        for(int i = 0; i < dimensions.size(); i++){
+            product *= dimensions[i];
+        }
+        return product;
+    }
+
+
+    int getLinearCoordinate(vector<int> coordinate) const {
+        if (coordinate.size() != n) {
+            // Check if the coordinate has the same number of dimensions as the tree
+            throw std::invalid_argument("Coordinate has incorrect dimensions.");
+        }
+
+        int linear_index = 0;
+        int multiplier = 1;
+
+        for (int i = n - 1; i >= 0; i--) {
+            if (coordinate[i] < 1 || coordinate[i] > dimensions[i]) {
+                throw std::out_of_range("Coordinate out of bounds.");
+            }
+            linear_index += (coordinate[i] - 1) * multiplier;
+            multiplier *= dimensions[i];
+        }
+
+        return linear_index;
+    }
+
+
+    vector<int> getArrayCoordinate(int linear_index) {
+        int n = dimensions.size();
+        vector<int> coordinate(n);
+
+        int multiplier = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            if (dimensions[i] <= 0) {
+                throw std::invalid_argument("Dimension size must be positive.");
+            }
+            coordinate[i] = (linear_index % (dimensions[i] * multiplier)) / multiplier + 1;
+            multiplier *= dimensions[i];
+        }
+
+        return coordinate;
+    }
+
+
+    // Publicly available update function
+    void update(vector<int> coordinates, int val){
+        vector<int> current(n);
+        updateRec(coordinates, val, 0, current);
+    }
+
+
+    // Publicly available query function
+    // Note that querying here is always done from the very first n-dimensional
+    // coordinate, and spans to the given coordinate.
+    int query(vector<int> coordinate) {
+        int sum{};
+        vector<int> current(n);
+        queryRec(coordinate, 0, sum, current);
+        return sum;
+    }
+
+    // In order to query in a range that doesn't start at the beginning index,
+    // we need to use this function, which removes and adds portions starting
+    // at the first coordinate in such a way as to give the correct answer.
+    int queryRange(vector<int> from, vector<int> to) {
+
+        int numConfigurations = 1 << n;
+        
+        int sum{};
+
+        for (int i = numConfigurations - 1; i >= 0; --i) {
+
+            vector<bool> config(n);
+
+            for (int j = 0; j < n; ++j) {
+                config[j] = (i & (1 << j)) != 0;
+            }
+
+            vector<int> newTo (n);
+            int countOfFalse{};
+            // config is the array
+            for(int i = 0; i < n; i++){
+                if(config[i]){
+                    newTo[i] = to[i];
+                }
+                else{
+                    newTo[i] = from[i] - 1;
+                    countOfFalse++;
+                }
+            }
+
+            // The count of false values in the code indicates if the sign
+            // should be + or -. There is always 0 false values in the
+            // first iteration, and then after that the sign alternates 
+            // with each number of false values.
+            if(countOfFalse % 2 == 0)
+                sum += query(newTo);
+            else
+                sum -= query(newTo);
+        }
+
+        return sum;
     }
 };
 
