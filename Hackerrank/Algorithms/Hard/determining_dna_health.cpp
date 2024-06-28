@@ -17,7 +17,7 @@ public:
         root = new TrieNode();
     }
 
-    // Add a pattern to the Aho-Corasick automaton
+    // Adds a pattern to the Aho-Corasick automaton
     void addPattern(const string& pattern, int h, int index) {
         TrieNode* current = root;
         for (char c : pattern) {
@@ -33,7 +33,7 @@ public:
         patterns.push_back(pattern);
     }
 
-    // Build failure links for all nodes in the trie
+    // Builds failure links for all nodes in the trie
     void buildFailureLinks() {
         queue<TrieNode*> q;
         for (char c = 'a'; c <= 'z'; ++c) {
@@ -61,7 +61,7 @@ public:
         }
     }
 
-    // Match patterns in the input string
+    // Matches patterns in the input string
     long long match(const string& text, int start, int end) {
         TrieNode* current = root;
         long long sum{};
@@ -74,7 +74,7 @@ public:
             current = current->children[c - 'a'] 
                 ? current->children[c - 'a'] : root;
 
-            // Traverse failure links and collect H values
+            // Traverses failure links and collect H values
             TrieNode* temp = current;
             while (temp != root) {
                 if (temp->isEndOfPattern) {

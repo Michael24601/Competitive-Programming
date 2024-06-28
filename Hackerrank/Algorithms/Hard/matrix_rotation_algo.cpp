@@ -30,7 +30,7 @@ using namespace std;
 // using the % square size operator to create a circular
 // shift, and to avoid having to work with a large r.  
 
-// We use a struct yo save the flattened squares, which, for later
+// We use a struct to save the flattened squares, which, for later
 // recalls where each element of the square was in the original matrix
 struct flatSquareElement {
     long value;
