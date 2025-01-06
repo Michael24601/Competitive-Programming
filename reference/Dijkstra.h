@@ -1,3 +1,4 @@
+
 #include <bits/stdc++.h>
 
 using namespace std;
@@ -27,6 +28,7 @@ using namespace std;
 vector<int> shortestPathDijkstraMatrix(
     const vector<vector<int>>& adjacencyMatrix, 
     int source, int destination) {
+
     int n = adjacencyMatrix.size();
     vector<int> distance(n, numeric_limits<int>::max());
     vector<int> parent(n, -1);
@@ -151,7 +153,7 @@ void findAllPathsDFS(const vector<vector<long long>>& graph,
     currentPath.pop_back();
 }
 
-// Send teh function the adjacency matrix, the source, destination, and
+// Send the function the adjacency matrix, the source, destination, and
 // the shortest distance (or any distance we want the path to be).
 vector<vector<long long>> findPathsGivenDistance(
     const vector<vector<long long>>& adjacencyMatrix, long long source, 

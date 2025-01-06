@@ -13,7 +13,7 @@ using namespace std;
 class Solution {
 public:
     bool canWinNim(short n) {
-        // Range 1-3 is winning because we can force a win
+        // Range 1-3 is winning because we can force a win.
         // Stone 4 is losing because no matter what we take, the other player 
         // will be in the 1-3 winning range
         // 5-7 is a winning range because the player can force the other

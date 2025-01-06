@@ -8,7 +8,7 @@
 // on an element and the idenity produces the element as is)
 // In other words, we need something that more or less resembeles a Group:
 // A set of elements on which a binary operator is applied; the operator must
-// be associative and must be aossicated with an idenity element.
+// be associative and there must be an idenity element.
 
 template <typename dataType>
 class SegmentTree {
