@@ -31,7 +31,7 @@ public:
         // If * then it is 9
         if(s[0] == '*') dp[1] = 9; 
         
-        // Else 
+        // Else r
         for(int i = 2; i <= s.size(); i++){
 
             // At each step we ensure the last entry
